@@ -3,7 +3,7 @@ import psycopg2
 # 🔹 Update these credentials
 DB_HOST = "localhost"
 DB_PORT = "5432"
-DB_NAME = "demodb"
+DB_NAME = "demo"
 DB_USER = "postgres"
 DB_PASSWORD = "dharmik"
 #DB_URL = "postgresql://postgres:admin@localhost:5432/demodb" 
