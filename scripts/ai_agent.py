@@ -12,8 +12,6 @@ load_dotenv()
 #openai_api_key = os.getenv("OPENAI_API_KEY")
 euri_api_key = os.getenv("EURI_API_KEY")
 
-if not euri_api_key:
-    raise ValueError("❌ EURIAI_API_KEY is missing. Set it in .env or as an environment variable.")
 
 # Define AI Model
 
