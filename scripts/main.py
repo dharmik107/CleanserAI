@@ -3,22 +3,10 @@ from data_cleaning import DataCleaning
 from ai_agent import AIAgent
 
 
-# ✅ Database Configuration
-
-DB_USER = "postgres"  # Replace with your real PostgreSQL username
-DB_PASSWORD = "admin"  # Replace with your PostgreSQL password
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_NAME = "demodb"
-
-DB_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-
-
-
 
 
 # ✅ Initialize Components
-ingestion = DataIngestion(DB_URL)
+ingestion = DataIngestion()
 cleaner = DataCleaning()
 ai_agent = AIAgent()
 
