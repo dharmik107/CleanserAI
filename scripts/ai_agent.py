@@ -1,20 +1,27 @@
-import groq
+import euriai
 import pandas as pd
 from dotenv import load_dotenv
 import os
 from langchain_groq import ChatGroq
+from euriai.langchain import create_chat_model
 from langgraph.graph import StateGraph, END
 from pydantic import BaseModel
 
 # Load API key from environment
 load_dotenv()
-groq_api_key = os.getenv("GROQ_API_KEY")
+#openai_api_key = os.getenv("OPENAI_API_KEY")
+euri_api_key = os.getenv("EURI_API_KEY")
 
-if not groq_api_key:
+if not euri_api_key:
     raise ValueError("❌ OPENAI_API_KEY is missing. Set it in .env or as an environment variable.")
 
 # Define AI Model
-llm = ChatGroq(api_key=groq_api_key, model="llama-3.1-8b-instant", temperature=0)
+
+llm = create_chat_model(
+    api_key=os.getenv("EURI_API_KEY"),
+    model="gpt-4.1-nano",
+    temperature=0.7
+)
 
 class CleaningState(BaseModel):
     """State schema defining input and output for the LangGraph agent."""
@@ -46,18 +53,17 @@ class AIAgent:
         """Processes data in batches to avoid OpenAI's token limit."""
         cleaned_responses = []
 
+        import re
         for i in range(0, len(df), batch_size):
             df_batch = df.iloc[i:i + batch_size]  # ✅ Process 20 rows at a time
 
             prompt = f"""
-            You are an AI Data Cleaning Agent. Analyze the dataset:
+            You are an AI Data Cleaning Agent. Analyze the dataset below:
 
             {df_batch.to_string()}
 
-            Identify missing values, choose the best imputation strategy (mean, mode, median), 
-            remove duplicates, and format text correctly.
-
-            Return the cleaned data as structured text.
+            Identify missing values, choose the best imputation strategy (mean, mode, median), remove duplicates, and format text correctly.
+            Return ONLY the cleaned data as CSV. Do NOT include explanations, comments, or code block markers. Output only the CSV data.
             """
 
             state = CleaningState(input_text=prompt, structured_response="")
@@ -66,6 +72,14 @@ class AIAgent:
             if isinstance(response, dict):
                 response = CleaningState(**response)
 
-            cleaned_responses.append(response.structured_response)  # ✅ Store results
+            # Clean the AI output: remove code block markers and extra text
+            output = response.structured_response.strip()
+            # Remove code block markers (``` or ```csv)
+            output = re.sub(r"^```[a-zA-Z]*", "", output)
+            output = re.sub(r"```$", "", output)
+            # Remove any leading/trailing whitespace and extra lines
+            output = output.strip()
+
+            cleaned_responses.append(output)  # ✅ Store cleaned results
 
         return "\n".join(cleaned_responses)  # ✅ Combine all cleaned results
