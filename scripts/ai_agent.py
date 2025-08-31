@@ -11,10 +11,7 @@ from pydantic import BaseModel
 load_dotenv()
 #openai_api_key = os.getenv("OPENAI_API_KEY")
 euri_api_key = os.getenv("EURI_API_KEY")
-
-
 # Define AI Model
-
 llm = create_chat_model(
     api_key=os.getenv("EURI_API_KEY"),
     model="gpt-4.1-nano",
